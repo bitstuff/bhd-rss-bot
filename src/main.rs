@@ -1,10 +1,9 @@
 use chrono::{DateTime, FixedOffset};
 use hashbrown::HashMap;
-use serde;
 use serde::{de, Deserialize, Deserializer};
 use serde_xml_rs::{from_str};
 
-fn naive_date_time_from_str<'de, D>(deserializer: D) -> Result<DateTime<FixedOffset>, D::Error>
+fn date_time_from_str<'de, D>(deserializer: D) -> Result<DateTime<FixedOffset>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -13,21 +12,50 @@ where
 }
 
 #[derive(Debug, Deserialize)]
+struct RawItem {
+    title: String,
+    link: String,
+    comments: String,
+    guid: String,
+    #[serde(deserialize_with="date_time_from_str", rename(deserialize = "pubDate"))]
+    pubdate: DateTime<FixedOffset>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(from = "RawItem")]
 struct Item {
     title: String,
-    #[serde(skip)]
     name: String,
-    #[serde(skip)]
     category: String,
-    #[serde(skip)]
     resolution: String,
-    #[serde(skip)]
     size: String,
     link: String,
     comments: String,
     guid: String,
-    #[serde(deserialize_with="naive_date_time_from_str", rename(deserialize = "pubDate"))]
     pubdate: DateTime<FixedOffset>,
+}
+
+impl std::convert::From<RawItem> for Item {
+    fn from(raw: RawItem) -> Self {
+        // split raw title into component pieces
+        let pieces: Vec<String> = raw.title
+            .split("/")
+            .map(|x| x.to_string())
+            .collect();
+        // and build the resulting processed Item
+        let item = Item {
+            title:      raw.title,
+            name:       pieces[0].clone(),
+            category:   pieces[1].clone(),
+            resolution: pieces[2].clone(),
+            size:       pieces[3].clone(),
+            link:       raw.link,
+            comments:   raw.comments,
+            guid:       raw.guid,
+            pubdate:    raw.pubdate,
+        };
+        return item;
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -76,6 +104,9 @@ fn main() {
 ";
     let rss: RSS = from_str(&resp).unwrap();
     for item in rss.channel.items {
-        println!("{}:  {}", item.pubdate, item.title);
+        println!("{}:  {}", item.pubdate, item.name);
     }
 }
+
+mod config;
+mod rss;
