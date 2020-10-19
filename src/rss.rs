@@ -1,5 +1,4 @@
 use chrono::{DateTime, FixedOffset};
-use hashbrown::HashMap;
 use serde::{de, Deserialize, Deserializer};
 
 fn date_time_from_str<'de, D>(deserializer: D) -> Result<DateTime<FixedOffset>, D::Error>

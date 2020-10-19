@@ -1,3 +1,4 @@
+use hashbrown::HashMap;
 use serde_xml_rs::{from_str};
 
 fn main() {
@@ -26,10 +27,15 @@ fn main() {
   </channel>
 </rss>
 ";
+    let mut _seen: HashMap<String, bool> = HashMap::new();
     let rss: rss::RSS = from_str(&resp).unwrap();
     for item in rss.channel.items {
         println!("{}:  {}", item.pubdate, item.name);
     }
+    let config = config::new();
+    println!("{:#?}", config);
+
 }
 
+mod config;
 mod rss;
