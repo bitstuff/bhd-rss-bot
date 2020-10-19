@@ -8,6 +8,7 @@ use toml;
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
+    pub dropdir: String,
     pub monitor: Vec<Monitor>,
 }
 
