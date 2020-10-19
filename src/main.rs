@@ -18,9 +18,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if seen.contains_key(&item.guid) {
                 continue;
             }
-            //println!("{}", item.name);
             for m in &monitor.matches {
-                if m.regex.is_match(&item.name) {
+                if m.resolution == item.resolution
+                      && m.category == item.category
+                      && m.regex.is_match(&item.name) {
                     let content = reqwest::blocking::get(&item.link)?
                         .bytes()?;
                     let mut filename = config.dropdir.clone();
@@ -30,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .collect();
                     filename.push_str(&capture[0][0]);
                     filename.push_str(".torrent");
-                    //println!("fetching {} to {}", item.guid, filename);
+                    println!("fetching {} to {}", item.guid, filename);
                     let mut file = File::create(filename)?;
                     file.write_all(&content)?;
                     break;

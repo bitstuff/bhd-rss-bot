@@ -1,4 +1,5 @@
 use chrono::{DateTime, FixedOffset};
+use regex::Regex;
 use serde::{de, Deserialize, Deserializer};
 use serde_xml_rs::{from_str};
 
@@ -44,18 +45,23 @@ pub struct Item {
 
 impl std::convert::From<RawItem> for Item {
     fn from(raw: RawItem) -> Self {
+        let ws_re  = Regex::new(r"^[[:blank:]]+(?P<t>.*)[[:blank:]]+$").unwrap();
         // split raw title into component pieces
-        let pieces: Vec<String> = raw.title
+        let pieces: Vec<&str> = raw.title
             .split("/")
-            .map(|x| x.to_string())
             .collect();
+        // strip leading/trailing space from the pieces of the title
+        let name       = ws_re.replace_all(pieces[0], "$t");
+        let category   = ws_re.replace_all(pieces[1], "$t");
+        let resolution = ws_re.replace_all(pieces[2], "$t");
+        let size       = ws_re.replace_all(pieces[3], "$t");
         // and build the resulting processed Item
         let item = Item {
-            title:      raw.title,
-            name:       pieces[0].clone(),
-            category:   pieces[1].clone(),
-            resolution: pieces[2].clone(),
-            size:       pieces[3].clone(),
+            title:      raw.title.clone(),
+            name:       name.to_string(),
+            category:   category.to_string(),
+            resolution: resolution.to_string(),
+            size:       size.to_string(),
             link:       raw.link,
             comments:   raw.comments,
             guid:       raw.guid,

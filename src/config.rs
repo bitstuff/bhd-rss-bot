@@ -35,8 +35,8 @@ where
 pub struct Match {
     #[serde(deserialize_with="regex_from_str")]
     pub regex: Regex,
-    pub category: Option<String>,
-    pub resolution: Option<String>,
+    pub category: String,
+    pub resolution: String,
     pub max_size: u64,
 }
 

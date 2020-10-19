@@ -22,6 +22,7 @@ frequency = 300
   
   [[monitor.matches]]
   name = "Example 2 (case-sensitive)"
+  category = "Test2"
   regex = "Example.Two"
   resolution = "2160p"
   max_size = 3758096000
@@ -33,7 +34,9 @@ frequency = 600
 
   [[monitor.matches]]
   name = "Example 3 (case-insensitive)"
+  category = "Test3"
   regex = "(?i)example.three"
+  resolution = "720p"
   max_size = 2684355000
 ```
 
@@ -42,5 +45,5 @@ Monitors consist of a name, a url, the frequency at which to poll
 the url for changes, and an array of patterns to match against.
 In this example the first monitor contains two matches, the
 second only one.  Matches consist of a name, a
-regular expression, an optional category, an optional resolution, and
+regular expression, a category, a resolution, and
 a maximum file size.  
