@@ -1,40 +1,46 @@
+use regex::Regex;
+use reqwest;
+use std::fs::File;
+use std::io::prelude::*;
+
 use hashbrown::HashMap;
-use serde_xml_rs::{from_str};
 
-fn main() {
-    let resp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<rss version=\"2.0\">
-    <channel>
-        <title>Beyond RSS</title>
-        <description>RSS feed for the latest uploaded torrents to BeyondHD.</description>
-        <link>https://beyond-hd.me/</link>
-        <lastBuildDate>Sun, 18 Oct 2020 18:37:12 +0000</lastBuildDate>
-        <pubDate>Sun, 18 Oct 2020 18:37:12 +0000</pubDate>
-                            <item>
-            <title>Foo Bar Baz 2020 720p BluRay DD5.1 x264-iFT / Movies / 720p / 5.41 GiB </title>
-            <link>https:///download/foo-bar-baz-2020-720p-bluray-dd51-x264-ift.2</link>
-            <comments>https:///foo-bar-baz-2020-720p-bluray-dd51-x264-ift.2</comments>
-            <guid>https:///foo-bar-baz-2020-720p-bluray-dd51-x264-ift.2</guid>
-            <pubDate>Sun, 18 Oct 2020 18:07:36 +0000</pubDate>
-        </item>
-                    <item>
-            <title>Foo Bar Baz 2020 1080p BluRay DDP 5.1 x264-iFT / Movies / 1080p / 10.06 GiB </title>
-            <link>https:///download/foo-bar-baz-2020-1080p-bluray-ddp-51-x264-ift.1</link>
-            <comments>https:///foo-bar-baz-2020-1080p-bluray-ddp-51-x264-ift.1</comments>
-            <guid>https:///foo-bar-baz-2020-1080p-bluray-ddp-51-x264-ift.1</guid>
-            <pubDate>Sun, 18 Oct 2020 17:00:37 +0000</pubDate>
-        </item>
-  </channel>
-</rss>
-";
-    let mut _seen: HashMap<String, bool> = HashMap::new();
-    let rss: rss::RSS = from_str(&resp).unwrap();
-    for item in rss.channel.items {
-        println!("{}:  {}", item.pubdate, item.name);
-    }
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut seen: HashMap<String, bool> = HashMap::new();
     let config = config::new();
-    println!("{:#?}", config);
 
+    let file_re = Regex::new(r"(/[^/]+)$").unwrap();
+    for monitor in &config.monitors {
+        let rssxml = reqwest::blocking::get(&monitor.url)?
+            .text()?;
+        let rss = rss::new(&rssxml);
+        for item in rss.channel.items {
+            if seen.contains_key(&item.guid) {
+                continue;
+            }
+            //println!("{}", item.name);
+            for m in &monitor.matches {
+                if m.regex.is_match(&item.name) {
+                    let content = reqwest::blocking::get(&item.link)?
+                        .bytes()?;
+                    let mut filename = config.dropdir.clone();
+                    println!("guid: {}", item.guid);
+                    let capture: Vec<regex::Captures> = file_re
+                        .captures_iter(&item.guid)
+                        .collect();
+                    filename.push_str(&capture[0][0]);
+                    filename.push_str(".torrent");
+                    println!("fetching {} to {}", item.guid, filename);
+                    let mut file = File::create(filename)?;
+                    file.write_all(&content)?;
+                    break;
+                }
+            }
+            seen.insert(item.guid, true);
+        }
+    }
+    
+    Ok(())
 }
 
 mod config;

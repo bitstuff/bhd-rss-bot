@@ -9,8 +9,8 @@ use toml;
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub dropdir: String,
-    #[serde(rename(deserialize = "match"))]
-    pub monitor: Vec<Monitor>,
+    #[serde(rename(deserialize = "monitor"))]
+    pub monitors: Vec<Monitor>,
 }
 
 #[derive(Debug, Deserialize)]

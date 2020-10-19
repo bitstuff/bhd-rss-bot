@@ -1,5 +1,6 @@
 use chrono::{DateTime, FixedOffset};
 use serde::{de, Deserialize, Deserializer};
+use serde_xml_rs::{from_str};
 
 fn date_time_from_str<'de, D>(deserializer: D) -> Result<DateTime<FixedOffset>, D::Error>
 where
@@ -72,4 +73,9 @@ struct RawItem {
     guid: String,
     #[serde(deserialize_with="date_time_from_str", rename(deserialize = "pubDate"))]
     pubdate: DateTime<FixedOffset>,
+}
+
+pub fn new (xml: &str) -> RSS {
+    let rss: RSS = from_str(xml).unwrap();
+    return rss;
 }
