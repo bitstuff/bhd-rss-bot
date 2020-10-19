@@ -9,6 +9,7 @@ use toml;
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub dropdir: String,
+    pub frequency: u64,
     #[serde(rename(deserialize = "monitor"))]
     pub monitors: Vec<Monitor>,
 }
@@ -17,7 +18,6 @@ pub struct Config {
 pub struct Monitor {
     pub name: String,
     pub url: String,
-    pub frequency: u32,
     #[serde(rename(deserialize = "match"))]
     pub matches: Vec<Match>,
 }

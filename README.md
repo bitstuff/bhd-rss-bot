@@ -7,11 +7,11 @@ looks something like
 
 ```
 dropdir = "/tmp/foo"
+frequency = 300
 
 [[monitor]]
 name = "Monitor 1"
 url = "<RSS URL>"
-frequency = 300
 
   [[monitor.matches]]
   name = "Example 1 (case-insensitive)"
@@ -40,9 +40,10 @@ frequency = 600
   max_size = 2684355000
 ```
 
-That is a directory to drop files into, and an array of monitors.
-Monitors consist of a name, a url, the frequency at which to poll
-the url for changes, and an array of patterns to match against.
+That is a directory to drop files into, the frequency at which to
+poll, and an array of monitors.
+Monitors consist of a name, a url, 
+and an array of patterns to match against.
 In this example the first monitor contains two matches, the
 second only one.  Matches consist of a name, a
 regular expression, a category, a resolution, and
