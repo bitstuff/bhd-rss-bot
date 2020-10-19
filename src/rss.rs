@@ -36,7 +36,7 @@ pub struct Item {
     pub name: String,
     pub category: String,
     pub resolution: String,
-    pub size: String,
+    pub size: u64,
     pub link: String,
     pub comments: String,
     pub guid: String,
@@ -46,6 +46,7 @@ pub struct Item {
 impl std::convert::From<RawItem> for Item {
     fn from(raw: RawItem) -> Self {
         let ws_re  = Regex::new(r"^[[:blank:]]+(?P<t>.*)[[:blank:]]+$").unwrap();
+        let size_re = Regex::new(r"^\D*(?P<d>[\d\.]+)\D*$").unwrap();
         // split raw title into component pieces
         let pieces: Vec<&str> = raw.title
             .split("/")
@@ -54,14 +55,16 @@ impl std::convert::From<RawItem> for Item {
         let name       = ws_re.replace_all(pieces[0], "$t");
         let category   = ws_re.replace_all(pieces[1], "$t");
         let resolution = ws_re.replace_all(pieces[2], "$t");
-        let size       = ws_re.replace_all(pieces[3], "$t");
+        let ssize      = size_re.replace_all(pieces[3], "$d");
+        let mut size   = ssize.parse::<f64>().unwrap();
+        size *= 1024_f64 * 1024_f64 * 1024_f64;
         // and build the resulting processed Item
         let item = Item {
             title:      raw.title.clone(),
             name:       name.to_string(),
             category:   category.to_string(),
             resolution: resolution.to_string(),
-            size:       size.to_string(),
+            size:       size as u64,
             link:       raw.link,
             comments:   raw.comments,
             guid:       raw.guid,

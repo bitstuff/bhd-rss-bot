@@ -21,6 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for m in &monitor.matches {
                 if m.resolution == item.resolution
                       && m.category == item.category
+                      && m.max_size > item.size
                       && m.regex.is_match(&item.name) {
                     let content = reqwest::blocking::get(&item.link)?
                         .bytes()?;
@@ -40,8 +41,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             seen.insert(item.guid, true);
         }
     }
-
-    //println!("{:#?}", seen);
     
     Ok(())
 }
