@@ -4,6 +4,17 @@ RSS Monitoring Bot for BHD
 Still a work-in-progress, and definitely several rough/sharp edges,
 but core functionality seems to be working.
 
+Simply put, files in a given RSS monitor are checked to ensure that
+for some `match` in that `monitor`:
+
+* the name matches `regex`
+* `category` matches given `category`
+* `resolution` is the same as specified
+* `size` is less-than or equal to `max_size` in bytes
+
+If a file matches all of the above, it is grabbed and placed in the
+configured `dropdir`.
+
 ## Configuration
 
 [TOML](https://toml.io/en/) config lives in
@@ -18,14 +29,14 @@ frequency = 300
 name = "Monitor 1"
 url = "<RSS URL>"
 
-  [[monitor.matches]]
+  [[monitor.match]]
   name = "Example 1 (case-insensitive)"
   category = "Test"
   regex = "(?i)example.one"
   resolution = "1080p"
   max_size = 3221225000
   
-  [[monitor.matches]]
+  [[monitor.match]]
   name = "Example 2 (case-sensitive)"
   category = "Test2"
   regex = "Example.Two"
@@ -37,7 +48,7 @@ name = "Monitor 2"
 url = "<Another RSS URL>"
 frequency = 600
 
-  [[monitor.matches]]
+  [[monitor.match]]
   name = "Example 3 (case-insensitive)"
   category = "Test3"
   regex = "(?i)example.three"
