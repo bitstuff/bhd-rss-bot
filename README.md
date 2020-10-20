@@ -1,6 +1,13 @@
 # bhd-rss-bot
 RSS Monitoring Bot for BHD
 
+Still a work-in-progress, and definitely several rough/sharp edges,
+but core functionality seems to be working.
+
+TODO:
+dockerize the resulting executable
+
+
 [TOML](https://toml.io/en/) config lives in
 `${HOME}/.config/bhd-rss-bot/config.toml`,
 looks something like
