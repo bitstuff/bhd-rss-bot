@@ -3,7 +3,7 @@ use std::io::prelude::*;
 use std::time::Duration;
 use std::thread::sleep;
 
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use hashbrown::HashMap;
 use regex::Regex;
 use reqwest;
