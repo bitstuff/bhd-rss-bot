@@ -4,9 +4,7 @@ RSS Monitoring Bot for BHD
 Still a work-in-progress, and definitely several rough/sharp edges,
 but core functionality seems to be working.
 
-TODO:
-dockerize the resulting executable
-
+## Configuration
 
 [TOML](https://toml.io/en/) config lives in
 `${HOME}/.config/bhd-rss-bot/config.toml`,
@@ -55,3 +53,23 @@ In this example the first monitor contains two matches, the
 second only one.  Matches consist of a name, a
 regular expression, a category, a resolution, and
 a maximum file size.  
+
+## Running in docker
+
+The included Dockerfile seems to be working.  Build with
+
+```
+docker build -t bitstuff/bhd-rss-bot .
+```
+
+and run with something like
+
+```
+docker run -d \
+  --restart unless-stopped \
+  -v $HOME/.config/bhd-rss-bot:/.config/bhd-rss-bot:ro \
+  -v <dropdir>:<dropdir> \
+  --name bhd-rss-bot \
+  bitstuff/bhd-rss-bot:latest
+
+```
