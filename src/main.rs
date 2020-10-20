@@ -10,7 +10,7 @@ use reqwest;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut seen: HashMap<String, bool> = HashMap::new();
-    let config = config::new();
+    let config = config::new()?;
 
     let sleep_time = Duration::new(config.frequency, 0);
     let file_re = Regex::new(r"(/[^/]+)$")?;
@@ -49,8 +49,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         sleep(sleep_time);
     }
-    
-    Ok(())
 }
 
 mod config;

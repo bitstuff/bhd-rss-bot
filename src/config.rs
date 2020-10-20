@@ -1,4 +1,5 @@
 use std::env;
+use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -27,7 +28,7 @@ where
     D: Deserializer<'de>,
 {
     let s: String = Deserialize::deserialize(deserializer)?;
-    let re = Regex::new(s.as_str()).unwrap();
+    let re = Regex::new(s.as_str()).expect(&format!("could not compile '{}' as a Regex", s));
     return Ok(re);
 }
 
@@ -40,18 +41,12 @@ pub struct Match {
     pub max_size: u64,
 }
 
-pub fn new () -> Config {
-    let path = format!("{}/.config/bhd-rss-bot/config.toml", env::var("HOME").unwrap());
+pub fn new () -> Result<Config, Box<dyn Error>> {
+    let path = format!("{}/.config/bhd-rss-bot/config.toml", env::var("HOME")?);
     let mut config_toml = String::new();
-    let mut file = match File::open(&path) {
-        Ok(file) => file,
-        Err(_)  => {
-            panic!("Could not find config file!")
-        }
-    };
-    file.read_to_string(&mut config_toml)
-        .unwrap_or_else(|err| panic!("Error while reading config: [{}]", err));
-    let config: Config = toml::from_str(&config_toml).unwrap();
+    let mut file = File::open(&path)?;
+    file.read_to_string(&mut config_toml)?;
+    let config: Config = toml::from_str(&config_toml)?;
     //println!("{:?}", config);
-    return config;
+    return Ok(config);
 }
