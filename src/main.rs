@@ -19,7 +19,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("{:?}: polling {}", Utc::now(), monitor.name);
             let rssxml = reqwest::blocking::get(&monitor.url)?
                 .text()?;
-            let rss = rss::new(&rssxml);
+            let rss = rss::new(&rssxml)
+                .expect(&format!("Unable to parse RSS response for {}", monitor.name));
             for item in rss.channel.items {
                 if seen.contains_key(&item.guid) {
                     continue;

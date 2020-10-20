@@ -28,7 +28,8 @@ where
     D: Deserializer<'de>,
 {
     let s: String = Deserialize::deserialize(deserializer)?;
-    let re = Regex::new(s.as_str()).expect(&format!("could not compile '{}' as a Regex", s));
+    let re = Regex::new(s.as_str())
+        .expect(&format!("could not compile '{}' as a Regex", s));
     return Ok(re);
 }
 

@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use chrono::{DateTime, FixedOffset};
 use regex::Regex;
 use serde::{de, Deserialize, Deserializer};
@@ -84,7 +86,7 @@ struct RawItem {
     pubdate: DateTime<FixedOffset>,
 }
 
-pub fn new (xml: &str) -> RSS {
-    let rss: RSS = from_str(xml).unwrap();
-    return rss;
+pub fn new (xml: &str) -> Result<RSS, Box<dyn Error>> {
+    let rss: RSS = from_str(xml)?;
+    return Ok(rss);
 }
