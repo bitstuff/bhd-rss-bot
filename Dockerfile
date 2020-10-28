@@ -2,19 +2,20 @@
 # multi-stage build feature. This also leverages the docker build cache to avoid
 # re-downloading dependencies if they have not changed.
 FROM rust:latest AS build
-WORKDIR /usr/src
 
 # Create a project and build the app's dependencies.
 # If the Cargo.toml or Cargo.lock files have not changed,
 # we can use the docker build cache and skip these (typically slow) steps.
-RUN USER=root cargo new bhd-rss-bot
-WORKDIR $HOME/git/bhd-rss-bot
+RUN cargo install cargo-build-dependencies
+RUN cd /tmp && USER=root cargo new bhd-rss-bot
+WORKDIR /tmp/bhd-rss-bot
 COPY Cargo.toml Cargo.lock ./
+# build dependencies in separate step, since they are less-likely to change
+RUN cargo build-dependencies --release
 # Copy the source and build the application.
-COPY src ./src
+COPY src /tmp/bhd-rss-bot/src
 RUN cargo build --release
-
-RUN cargo install --path .
+RUN strip target/release/bhd-rss-bot
 
 # use a slim debian container
 FROM debian:buster-slim as scratch
@@ -27,6 +28,6 @@ RUN apt-get -y install --no-install-recommends libssl1.1 ca-certificates
 # but clean up to keep things as slim as posible
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # copy in our (nearly) static executable (still needs libssl)
-COPY --from=build /usr/local/cargo/bin/bhd-rss-bot .
+COPY --from=build /tmp/bhd-rss-bot/target/release/bhd-rss-bot .
 USER 1000:1000
 CMD ["/bhd-rss-bot"]
