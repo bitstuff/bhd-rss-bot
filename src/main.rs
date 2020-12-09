@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let file_re = Regex::new(r"(/[^/]+)$")?;
     loop {
         for monitor in &config.monitors {
-            println!("{:?}: polling {}", Utc::now(), monitor.name);
+            //println!("{:?}: polling {}", Utc::now(), monitor.name);
             let rssxml = reqwest::blocking::get(&monitor.url)?
                 .text()?;
             let rss = rss::new(&rssxml)
