@@ -8,17 +8,17 @@ use hashbrown::HashMap;
 use regex::Regex;
 use reqwest;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut seen: HashMap<String, bool> = HashMap::new();
     let config = config::new()?;
-
     let sleep_time = Duration::new(config.frequency, 0);
     let file_re = Regex::new(r"(/[^/]+)$")?;
     loop {
         for monitor in &config.monitors {
             //println!("{:?}: polling {}", Utc::now(), monitor.name);
-            let rssxml = reqwest::blocking::get(&monitor.url)?
-                .text()?;
+	    let rssxml = reqwest::get(&monitor.url).await?
+                .text().await?;
             let rss = rss::new(&rssxml)
                 .expect(&format!("Unable to parse RSS response for {}", monitor.name));
             for item in rss.channel.items {

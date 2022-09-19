@@ -90,3 +90,17 @@ pub fn new (xml: &str) -> Result<RSS, Box<dyn Error>> {
     let rss: RSS = from_str(xml)?;
     return Ok(rss);
 }
+
+#[test]
+fn test_parser() {
+    use std::io::prelude::*;
+    use std::fs::File;
+    let mut file = File::open("src/tests/rss-example.xml").expect("Unable to open test file");
+    let mut xml = String::new();
+    file.read_to_string(&mut xml).expect("Unable to read the file");
+    let result = new(&xml);
+    match result {
+	Err(why) => panic!("{}", why),
+	Ok(_rss) => assert!(true),
+    }
+}
