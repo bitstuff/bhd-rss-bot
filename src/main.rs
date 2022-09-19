@@ -30,8 +30,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                           && m.category == item.category
                           && m.max_size > item.size
                           && m.regex.is_match(&item.name) {
-                        let content = reqwest::blocking::get(&item.link)?
-                            .bytes()?;
+                        let content = reqwest::get(&item.link).await?
+                            .bytes().await?;
                         let mut filename = config.dropdir.clone();
                         //println!("guid: {}", item.guid);
                         let capture: Vec<regex::Captures> = file_re
